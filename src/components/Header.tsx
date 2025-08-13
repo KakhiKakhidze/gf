@@ -43,7 +43,7 @@ const Header: React.FC = () => {
         </div>
         <div className="header-stats">
           <div className="stat">
-            <span className="stat-number">158</span>
+            <span className="stat-number">∞</span>
             <span className="stat-label">Moments of Love</span>
           </div>
           <div className="stat">

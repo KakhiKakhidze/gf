@@ -3,7 +3,8 @@ import React, { useState, useEffect } from 'react';
 const LoveChat: React.FC = () => {
   const [currentMessage, setCurrentMessage] = useState('');
   const [messageHistory, setMessageHistory] = useState<string[]>([]);
-  const [isVisible, setIsVisible] = useState(true);
+  const [isOpen, setIsOpen] = useState(false);
+  const [messageCount, setMessageCount] = useState(0);
 
   const loveMessages = [
     "Every moment with you is pure magic ✨",
@@ -129,57 +130,91 @@ const LoveChat: React.FC = () => {
     // Set initial message
     setCurrentMessage(loveMessages[0]);
     setMessageHistory([loveMessages[0]]);
+    setMessageCount(1);
 
     // Send a new message every minute
     const interval = setInterval(() => {
       const randomIndex = Math.floor(Math.random() * loveMessages.length);
       const newMessage = loveMessages[randomIndex];
       setCurrentMessage(newMessage);
-      setMessageHistory(prev => [...prev.slice(-4), newMessage]); // Keep last 5 messages
+      setMessageHistory(prev => [...prev, newMessage]); // Keep all messages
+      setMessageCount(prev => prev + 1);
     }, 60000); // 60 seconds
 
     return () => clearInterval(interval);
   }, []);
 
-  if (!isVisible) return null;
+  const toggleChat = () => {
+    setIsOpen(!isOpen);
+  };
 
   return (
-    <div className="love-chat">
-      <div className="chat-header">
-        <span className="chat-title">💕 Love Messages 💕</span>
-        <button 
-          className="chat-close" 
-          onClick={() => setIsVisible(false)}
-        >
-          ×
-        </button>
+    <>
+      {/* Floating Heart Button */}
+      <div className="floating-heart-button" onClick={toggleChat}>
+        <div className="heart-icon">💕</div>
+        {messageCount > 0 && (
+          <div className="message-badge">{messageCount}</div>
+        )}
+        <div className="heart-tooltip">Click to see love messages 💕</div>
       </div>
-      
-      <div className="chat-messages">
-        {messageHistory.map((message, index) => (
-          <div 
-            key={index} 
-            className={`chat-message ${index === messageHistory.length - 1 ? 'current' : ''}`}
-          >
-            <div className="message-bubble">
-              <span className="message-text">{message}</span>
-              <div className="message-hearts">
-                <span>💕</span>
-                <span>💖</span>
-                <span>💝</span>
+
+      {/* Chat Window */}
+      {isOpen && (
+        <div className="love-chat">
+          <div className="chat-header">
+            <span className="chat-title">💕 Love Messages ({messageCount}) 💕</span>
+            <button 
+              className="chat-close" 
+              onClick={toggleChat}
+            >
+              ×
+            </button>
+          </div>
+          
+          <div className="chat-messages">
+            {messageHistory.length === 0 ? (
+              <div className="no-messages">
+                <div className="no-messages-icon">💕</div>
+                <p>Waiting for love messages...</p>
+                <p>New message every minute!</p>
               </div>
+            ) : (
+              messageHistory.map((message, index) => (
+                <div 
+                  key={index} 
+                  className={`chat-message ${index === messageHistory.length - 1 ? 'current' : ''}`}
+                >
+                  <div className="message-bubble">
+                    <span className="message-text">{message}</span>
+                    <div className="message-hearts">
+                      <span>💕</span>
+                      <span>💖</span>
+                      <span>💝</span>
+                    </div>
+                    <div className="message-time">
+                      Message #{index + 1}
+                    </div>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+          
+          <div className="chat-footer">
+            <div className="love-indicator">
+              <span className="pulse-heart">💓</span>
+              <span className="indicator-text">
+                {messageCount > 0 
+                  ? `Sending love every minute... (${messageCount} messages sent)`
+                  : "Sending love every minute..."
+                }
+              </span>
             </div>
           </div>
-        ))}
-      </div>
-      
-      <div className="chat-footer">
-        <div className="love-indicator">
-          <span className="pulse-heart">💓</span>
-          <span className="indicator-text">Sending love every minute...</span>
         </div>
-      </div>
-    </div>
+      )}
+    </>
   );
 };
 

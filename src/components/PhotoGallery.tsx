@@ -9,6 +9,7 @@ const PhotoGallery: React.FC<PhotoGalleryProps> = ({ images }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [showLoveMessage, setShowLoveMessage] = useState(false);
+  const [autoAdvance, setAutoAdvance] = useState(false);
 
   useEffect(() => {
     console.log('PhotoGallery received images:', images.length);
@@ -17,11 +18,46 @@ const PhotoGallery: React.FC<PhotoGalleryProps> = ({ images }) => {
     }
   }, [images]);
 
+  // Function to trigger music start
+  const triggerMusicStart = () => {
+    // Dispatch custom event to trigger music
+    const musicEvent = new CustomEvent('startLoveMusic', {
+      detail: { source: 'gallery-click' }
+    });
+    document.dispatchEvent(musicEvent);
+    console.log('🎵 Triggered music start from gallery click!');
+  };
+
+  // Auto-advance through images
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+    
+    if (autoAdvance && isModalOpen) {
+      interval = setInterval(() => {
+        setCurrentIndex(prevIndex => {
+          const nextIndex = (prevIndex + 1) % images.length;
+          setSelectedImage(images[nextIndex]);
+          return nextIndex;
+        });
+      }, 1000); // 1 second per image
+    }
+
+    return () => {
+      if (interval) {
+        clearInterval(interval);
+      }
+    };
+  }, [autoAdvance, isModalOpen, images]);
+
   const openModal = (image: string, index: number) => {
     setSelectedImage(image);
     setCurrentIndex(index);
     setIsModalOpen(true);
+    setAutoAdvance(true); // Start auto-advance
     document.body.style.overflow = 'hidden';
+    
+    // Trigger music when photo is clicked
+    triggerMusicStart();
     
     // Show romantic message occasionally
     if (Math.random() < 0.3) {
@@ -33,6 +69,7 @@ const PhotoGallery: React.FC<PhotoGalleryProps> = ({ images }) => {
   const closeModal = () => {
     setIsModalOpen(false);
     setSelectedImage(null);
+    setAutoAdvance(false); // Stop auto-advance
     document.body.style.overflow = 'unset';
     setShowLoveMessage(false);
   };
@@ -49,6 +86,10 @@ const PhotoGallery: React.FC<PhotoGalleryProps> = ({ images }) => {
     setSelectedImage(images[prevIndex]);
   };
 
+  const toggleAutoAdvance = () => {
+    setAutoAdvance(!autoAdvance);
+  };
+
   const handleKeyDown = (e: KeyboardEvent) => {
     if (!isModalOpen) return;
     
@@ -62,6 +103,10 @@ const PhotoGallery: React.FC<PhotoGalleryProps> = ({ images }) => {
       case 'ArrowLeft':
         prevImage();
         break;
+      case ' ': // Spacebar
+        e.preventDefault();
+        toggleAutoAdvance();
+        break;
     }
   };
 
@@ -71,7 +116,7 @@ const PhotoGallery: React.FC<PhotoGalleryProps> = ({ images }) => {
       document.removeEventListener('keydown', handleKeyDown);
       document.body.style.overflow = 'unset';
     };
-  }, [isModalOpen, currentIndex]);
+  }, [isModalOpen, currentIndex, autoAdvance]);
 
   const handleImageError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
     console.error('Image failed to load:', e.currentTarget.src);
@@ -171,11 +216,7 @@ const PhotoGallery: React.FC<PhotoGalleryProps> = ({ images }) => {
               <span>›</span>
             </button>
             
-            <div className="modal-info">
-              <span className="modal-counter">
-                💕 {currentIndex + 1} / {images.length} 💕
-              </span>
-            </div>
+
           </div>
         </div>
       )}

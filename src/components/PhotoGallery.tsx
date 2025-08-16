@@ -285,19 +285,6 @@ const PhotoGallery: React.FC<PhotoGalleryProps> = ({ images }) => {
                 </div>
               </div>
             </div>
-            
-            <div className="modal-info">
-              <span className="modal-counter">
-                💕 {currentIndex + 1} / {images.length} 💕
-              </span>
-              <button 
-                className={`auto-advance-button ${autoAdvance ? 'active' : ''}`}
-                onClick={toggleAutoAdvance}
-                title={autoAdvance ? "Stop Auto-Advance (Spacebar)" : "Start Auto-Advance (Spacebar)"}
-              >
-                {autoAdvance ? "⏸️" : "▶️"} Auto
-              </button>
-            </div>
           </div>
         </div>
       )}

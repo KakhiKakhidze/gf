@@ -13,6 +13,7 @@ function App() {
     // Get all image files from the public/images directory
     const getImageFiles = () => {
       const allImages = [
+        'Screenshot_20250425_170943_Instagram.jpg',
         '1415b252-8d06-467a-8885-af8c040896c2.jpg',
         '20240214_225954.jpg',
         '20240214_230000.jpg',
@@ -151,8 +152,7 @@ function App() {
         'received_894573895750276.jpeg',
         'Screenshot_20240925_180912_Instagram.jpg',
         'Screenshot_20240930_090408_Instagram.jpg',
-        'Screenshot_20241005_001021_Instagram.jpg',
-        'Screenshot_20250425_170943_Instagram.jpg'
+        'Screenshot_20241005_001021_Instagram.jpg'
       ];
       
       return allImages.map(image => `/images/${image}`);
